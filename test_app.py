@@ -1,20 +1,21 @@
 import unittest
+
 from app import app
 
-class TestLinkedInAgent(unittest.TestCase):
 
+class ReviewerDemoTests(unittest.TestCase):
     def setUp(self):
-        self.app = app.test_client()
+        self.client = app.test_client()
 
-    def test_start_route(self):
-        response = self.app.get('/start')
+    def test_home(self):
+        self.assertEqual(self.client.get("/").status_code, 200)
+
+    def test_start_is_simulated(self):
+        response = self.client.post("/start-agent")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'AI Agent started', response.data)
+        self.assertEqual(response.get_json(), {"status": "simulated"})
 
-    def test_log_route(self):
-        response = self.app.get('/log')
+    def test_log_is_a_fixture(self):
+        response = self.client.get("/log")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Log data:', response.data)
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(response.get_json()["log"], ["Sample log entry 1", "Sample log entry 2"])
